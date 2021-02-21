@@ -28,7 +28,6 @@ const LoginForm = (props: any) => {
       return;
     }
     //TODO: call server API to authenticate user
-    props.navigation.replace('Home');
   };
 
   return (
@@ -41,7 +40,7 @@ const LoginForm = (props: any) => {
           onChangeText={(value) => {
             setUsername(value);
           }}
-          leftIcon={<Icon name="envelope-o" size={20} color="black" />}
+          leftIcon={<Icon name="user" size={20} color="black" />}
         />
       </View>
       <View style={{marginTop: 20}}>

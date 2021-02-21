@@ -1,5 +1,5 @@
 import React from 'react';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import {View, Text} from 'react-native';
 import {Card} from 'react-native-elements';
 import {Color} from '../util/Colors';
