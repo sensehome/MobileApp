@@ -64,10 +64,13 @@ const TabStackContainer = () => (
 const App = () => {
   return (
     <NavigationContainer>
-      <RootStack.Navigator mode="modal" headerMode="none">
+      <RootStack.Navigator
+        initialRouteName="Login"
+        mode="modal"
+        headerMode="none">
         <RootStack.Screen name="Main" component={TabStackContainer} />
         {/* use full screens modal2 */}
-        <RootStack.Screen name="Menu" component={LoginScreenContainer} />
+        <RootStack.Screen name="Login" component={LoginScreenContainer} />
       </RootStack.Navigator>
     </NavigationContainer>
   );
