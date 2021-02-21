@@ -65,7 +65,7 @@ const App = () => {
   return (
     <NavigationContainer>
       <RootStack.Navigator
-        initialRouteName="Login"
+        initialRouteName="Main"
         mode="modal"
         headerMode="none">
         <RootStack.Screen name="Main" component={TabStackContainer} />
