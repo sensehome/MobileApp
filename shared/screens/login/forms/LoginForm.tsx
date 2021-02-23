@@ -1,9 +1,12 @@
 import React from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {Text, View} from 'react-native';
+import {View} from 'react-native';
 import {Input, Button} from 'react-native-elements';
+import {AuthContext} from '../../../contexts/AuthContext';
 
 const LoginForm = (props: any) => {
+  const authContext = React.useContext(AuthContext);
+
   const usernameRef = React.createRef<Input>();
   const passwordRef = React.createRef<Input>();
 
@@ -27,7 +30,10 @@ const LoginForm = (props: any) => {
     if (!checkIfFormDataIsValid()) {
       return;
     }
-    //TODO: call server API to authenticate user
+    authContext.onLogin({
+      name: username,
+      password: password,
+    });
   };
 
   return (
@@ -60,6 +66,8 @@ const LoginForm = (props: any) => {
           title="Login"
           buttonStyle={{paddingTop: 12, paddingBottom: 12}}
           titleStyle={{fontSize: 18}}
+          disabled={authContext.isLogging}
+          loading={authContext.isLogging}
           onPress={(e) => {
             e.preventDefault();
             handleLoginClick();

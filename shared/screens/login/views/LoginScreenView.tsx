@@ -1,10 +1,9 @@
 import React from 'react';
 import {StatusBar, Text, View} from 'react-native';
-import {Image} from 'react-native-elements';
+import {Button, Image} from 'react-native-elements';
 import LoginForm from '../forms/LoginForm';
-import SenseHomeIcon from './assets/sensehome.png';
 
-const LoginScreenView = (props: any) => {
+const LoginScreenView = (props: {isMouned?: boolean}) => {
   return (
     <>
       <StatusBar backgroundColor="aliceblue" barStyle="dark-content" />
@@ -16,7 +15,8 @@ const LoginScreenView = (props: any) => {
           backgroundColor: 'aliceblue',
         }}>
         <Image
-          source={SenseHomeIcon}
+          source={require('./assets/sensehome.png')}
+          transition={false}
           style={{
             width: 50,
             height: 50,
@@ -25,10 +25,10 @@ const LoginScreenView = (props: any) => {
         <View style={{width: 400}}>
           <View style={{marginBottom: 40}}>
             <Text style={{fontSize: 20, textAlign: 'center'}}>
-              Authentication
+              {props.isMouned ? 'Authentication' : 'Getting Ready'}
             </Text>
           </View>
-          <LoginForm />
+          {props.isMouned ? <LoginForm /> : <Button loading type="clear" />}
         </View>
       </View>
     </>

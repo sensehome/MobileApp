@@ -1,3 +1,5 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const KEYS = {
   Bearer: 'bearer',
 };
@@ -6,21 +8,16 @@ const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IiIsInJv
 
 const StoreService = {
   getBearerToken: async (): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      return resolve(token);
-    });
+    let token = await AsyncStorage.getItem('@storage_Key')
+    return token!!
   },
 
   setBearerToken: async (token: string): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      return resolve();
-    });
+    await AsyncStorage.setItem(KEYS.Bearer, token)
   },
 
   remoteBearerToken: async (): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      return resolve();
-    });
+    await AsyncStorage.removeItem(KEYS.Bearer);
   },
 };
 
