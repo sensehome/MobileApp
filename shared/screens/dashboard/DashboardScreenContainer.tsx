@@ -33,13 +33,15 @@ export default class DashboardScreenContainer extends React.Component<
 
   componentDidMount() {
     StoreService.getBearerToken()
-      .then((res) => {
-        this.initializeAgentHubConnection();
+      .then((token) => {
+        this.initializeAgentHubConnection(token);
         this.setState({
           isLoggedIn: true,
         });
       })
-      .catch((err) => {})
+      .catch((err) => {
+        console.log(err);
+      })
       .finally(() => {
         this.setState({
           shouldRender: true,
@@ -47,11 +49,11 @@ export default class DashboardScreenContainer extends React.Component<
       });
   }
 
-  initializeAgentHubConnection = () => {
+  initializeAgentHubConnection = (accessToken: string) => {
     if (
       AgentService.getInstance().Hub.state === HubConnectionState.Disconnected
     ) {
-      AgentService.getInstance()
+      AgentService.getInstance(accessToken)
         .Hub.start()
         .then(() => {
           this.agentHubSubsriptions();
@@ -70,7 +72,21 @@ export default class DashboardScreenContainer extends React.Component<
   };
 
   autoReconnectAgent = () => {
-    setTimeout(this.initializeAgentHubConnection, 5000);
+    setTimeout(() => {
+      StoreService.getBearerToken()
+        .then((res) => {
+          this.initializeAgentHubConnection(res);
+        })
+        .catch((err) => {
+          AgentService.getInstance()
+            .Hub.stop()
+            .then((r) => {})
+            .catch((e) => {})
+            .finally(() => {
+              this.props.navigation.navigate('Login');
+            });
+        });
+    }, 5000);
   };
 
   agentHubSubsriptions = () => {

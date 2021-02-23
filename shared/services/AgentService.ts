@@ -17,10 +17,10 @@ export class AgentService {
       .build();
   }
 
-  public static getInstance(): AgentService {
+  public static getInstance(accessToken? : string): AgentService {
 
     if (!AgentService.instance) {
-      AgentService.instance = new AgentService(`http://agent.sensehome.online/agenthub?access_token=${token}`)
+      AgentService.instance = new AgentService(`http://agent.sensehome.online/agenthub?access_token=${accessToken}`)
     }
     return AgentService.instance
   }

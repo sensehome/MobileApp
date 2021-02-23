@@ -8,7 +8,7 @@ const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IiIsInJv
 
 const StoreService = {
   getBearerToken: async (): Promise<string> => {
-    let token = await AsyncStorage.getItem('@storage_Key')
+    let token = await AsyncStorage.getItem(KEYS.Bearer)
     if(!token){
       throw new Error("Token not found")
     }
