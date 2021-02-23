@@ -7,6 +7,7 @@ import {TemperatureHumidityDto} from '../../models/TemperatureHumidityDto';
 import {TemperatureHumidityProvider} from '../../contexts/TemperatureHumidityContext';
 import {LightFanActionProvider} from '../../contexts/LightFanActionContext';
 import {ConnectivityProvider} from '../../contexts/ConnectivityContext';
+import {ScrollView, StatusBar, Alert} from 'react-native';
 
 export default class DashboardScreenContainer extends React.Component<
   any,
@@ -34,7 +35,7 @@ export default class DashboardScreenContainer extends React.Component<
   componentDidMount() {
     StoreService.getBearerToken()
       .then((token) => {
-        this.initializeAgentHubConnection(token);
+        this.initializeAgentHubConnection();
         this.setState({
           isLoggedIn: true,
         });
@@ -49,47 +50,44 @@ export default class DashboardScreenContainer extends React.Component<
       });
   }
 
-  initializeAgentHubConnection = (accessToken: string) => {
-    if (
-      AgentService.getInstance().Hub.state === HubConnectionState.Disconnected
-    ) {
-      AgentService.getInstance(accessToken)
-        .Hub.start()
-        .then(() => {
-          this.agentHubSubsriptions();
-          AgentService.getInstance().Hub.onclose((err) => {
-            this.autoReconnectAgent();
-          });
-          this.setState({
-            isAgentAndBrokerIsConnected: true,
-            isMobileAndAgentIsConnected: true,
-          });
-        })
-        .catch((err) => {
-          console.log(err);
+  initializeAgentHubConnection = () => {
+    AgentService.connect()
+      .then(() => {
+        this.startAgentHubService();
+      })
+      .catch((err) => {
+        Alert.alert(JSON.stringify(err));
+      });
+  };
+
+  startAgentHubService = () => {
+    console.log(AgentService.hasInstance());
+    console.log(AgentService.getInstance());
+    AgentService.getInstance()
+      .Hub.start()
+      .then(() => {
+        this.agentHubSubsriptions();
+        AgentService.getInstance().Hub.onclose((err) => {
+          this.autoReconnectAgent();
         });
-    }
+        this.setState({
+          isAgentAndBrokerIsConnected: true,
+          isMobileAndAgentIsConnected: true,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   autoReconnectAgent = () => {
-    setTimeout(() => {
-      StoreService.getBearerToken()
-        .then((res) => {
-          this.initializeAgentHubConnection(res);
-        })
-        .catch((err) => {
-          AgentService.getInstance()
-            .Hub.stop()
-            .then((r) => {})
-            .catch((e) => {})
-            .finally(() => {
-              this.props.navigation.navigate('Login');
-            });
-        });
-    }, 5000);
+    setTimeout(this.initializeAgentHubConnection, 5000);
   };
 
   agentHubSubsriptions = () => {
+    if (!AgentService.hasInstance()) {
+      return;
+    }
     let agentHub = AgentService.getInstance().Hub;
 
     let callbackMap = [
@@ -187,11 +185,13 @@ export default class DashboardScreenContainer extends React.Component<
     let payload = JSON.stringify({
       status: this.state.fanSwitch ? 'OFF' : 'ON',
     });
-    AgentService.getInstance().Hub.invoke(
-      AgentService.RpcInvokePublish,
-      topic,
-      payload,
-    );
+    if (AgentService.hasInstance()) {
+      AgentService.getInstance().Hub.invoke(
+        AgentService.RpcInvokePublish,
+        topic,
+        payload,
+      );
+    }
   };
 
   handleLightSwitch = (isOn: boolean) => {
@@ -199,43 +199,60 @@ export default class DashboardScreenContainer extends React.Component<
     let payload = JSON.stringify({
       status: this.state.lightSwitch ? 'OFF' : 'ON',
     });
-    AgentService.getInstance().Hub.invoke(
-      AgentService.RpcInvokePublish,
-      topic,
-      payload,
-    );
+    if (AgentService.hasInstance()) {
+      AgentService.getInstance().Hub.invoke(
+        AgentService.RpcInvokePublish,
+        topic,
+        payload,
+      );
+    }
   };
 
   render() {
     return (
-      <TemperatureHumidityProvider
-        value={{
-          temperatureHistory: this.state.temperatureList,
-          humiditityHistory: this.state.humidityList,
-          temperature: this.state.temperature,
-          humidity: this.state.humidity,
-          timeSeries: this.state.timeSeries,
-        }}>
-        <LightFanActionProvider
-          value={{
-            lightStatus: this.state.lightStatus,
-            fanStatus: this.state.fanStatus,
-            lightSwitch: this.state.lightSwitch,
-            fanSwitch: this.state.fanSwitch,
-            onFanSwitch: this.handleFanSwitch,
-            onLightSwitch: this.handleLightSwitch,
+      <>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor={
+            this.state.isMobileAndAgentIsConnected ? 'mediumseagreen' : 'salmon'
+          }
+        />
+        <ScrollView
+          style={{
+            backgroundColor: this.state.isMobileAndAgentIsConnected
+              ? 'mediumseagreen'
+              : 'salmon',
           }}>
-          <ConnectivityProvider
+          <TemperatureHumidityProvider
             value={{
-              isMobileAndAgentIsConnected: this.state
-                .isMobileAndAgentIsConnected,
-              isAgentAndBrokerIsConnected: this.state
-                .isAgentAndBrokerIsConnected,
+              temperatureHistory: this.state.temperatureList,
+              humiditityHistory: this.state.humidityList,
+              temperature: this.state.temperature,
+              humidity: this.state.humidity,
+              timeSeries: this.state.timeSeries,
             }}>
-            <DashboardScreenView />
-          </ConnectivityProvider>
-        </LightFanActionProvider>
-      </TemperatureHumidityProvider>
+            <LightFanActionProvider
+              value={{
+                lightStatus: this.state.lightStatus,
+                fanStatus: this.state.fanStatus,
+                lightSwitch: this.state.lightSwitch,
+                fanSwitch: this.state.fanSwitch,
+                onFanSwitch: this.handleFanSwitch,
+                onLightSwitch: this.handleLightSwitch,
+              }}>
+              <ConnectivityProvider
+                value={{
+                  isMobileAndAgentIsConnected: this.state
+                    .isMobileAndAgentIsConnected,
+                  isAgentAndBrokerIsConnected: this.state
+                    .isAgentAndBrokerIsConnected,
+                }}>
+                <DashboardScreenView />
+              </ConnectivityProvider>
+            </LightFanActionProvider>
+          </TemperatureHumidityProvider>
+        </ScrollView>
+      </>
     );
   }
 }

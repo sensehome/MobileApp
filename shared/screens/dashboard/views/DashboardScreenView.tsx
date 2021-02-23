@@ -17,27 +17,24 @@ const DashboardScreenView = (props: Props) => {
   const connectivityContext = React.useContext(ConnectivityContext);
 
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        <StatusBar />
-        <View>
-          <View style={styles.flexCenter}>
-            <LightFanCardView />
-          </View>
-
-          <View style={styles.flexCenter}>
-            <TemperatureHumidityCardView />
-          </View>
+    <View style={styles.container}>
+      <View>
+        <View style={styles.flexCenter}>
+          <LightFanCardView />
         </View>
 
-        <View
-          style={{
-            marginTop: 10,
-          }}>
-          <TemperatureHumiditityChartView />
+        <View style={styles.flexCenter}>
+          <TemperatureHumidityCardView />
         </View>
       </View>
-    </ScrollView>
+
+      <View
+        style={{
+          marginTop: 10,
+        }}>
+        <TemperatureHumiditityChartView />
+      </View>
+    </View>
   );
 };
 

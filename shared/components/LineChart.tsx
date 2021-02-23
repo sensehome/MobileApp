@@ -15,7 +15,7 @@ interface Props {
 export default function LineChart(props: Props) {
   return (
     <View>
-      <Text style={{textAlign: 'center'}}>{props.name}</Text>
+      <Text style={{textAlign: 'center', color: 'white'}}>{props.name}</Text>
       <LineChartKit
         data={{
           labels: props.labels,
