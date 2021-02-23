@@ -1,9 +1,17 @@
 import React from 'react';
-import {StatusBar, Text, View} from 'react-native';
+import {StatusBar, Text, View, Alert} from 'react-native';
 import {Button, Image} from 'react-native-elements';
-import SenseHomeIcon from './assets/sensehome.png';
+import StoreService from '../../services/StoreService';
 
 export default class MenuScreenContainer extends React.Component<any, any> {
+  onLogout = () => {
+    StoreService.remoteBearerToken()
+      .then(() => {})
+      .catch((err) => {})
+      .finally(() => {
+        this.props.navigation.navigate('Login');
+      });
+  };
   render() {
     return (
       <>
@@ -16,7 +24,7 @@ export default class MenuScreenContainer extends React.Component<any, any> {
             backgroundColor: 'crimson',
           }}>
           <Image
-            source={SenseHomeIcon}
+            source={require('./assets/sensehome.png')}
             style={{
               width: 50,
               height: 50,
@@ -50,7 +58,7 @@ export default class MenuScreenContainer extends React.Component<any, any> {
               }}
               titleStyle={{fontSize: 18}}
               onPress={(e) => {
-                this.props.navigation.navigate('Login');
+                this.onLogout();
               }}
             />
           </View>

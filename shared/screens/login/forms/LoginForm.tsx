@@ -30,6 +30,8 @@ const LoginForm = (props: any) => {
     if (!checkIfFormDataIsValid()) {
       return;
     }
+    setPassword('');
+    setUsername('');
     authContext.onLogin({
       name: username,
       password: password,
